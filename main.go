@@ -11,7 +11,7 @@ import (
 
 const (
 	moduleOwner  = "puppetlabs"
-	imageName    = "ghcr.io/chelnak/cat-github-metric-collector"
+	imageName    = "ghcr.io/chelnak/cat-team-github-metrics:latest"
 	scheduleCron = "0 0 * * *"
 	scheduleType = "schedule"
 )
@@ -23,7 +23,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	w := workflow.NewWorkflow()
+	w := workflow.NewWorkflow("A workflow for collecting GitHub metrics.")
+
 	w.AddTrigger(
 		workflow.Trigger{
 			Name: "schedule",
@@ -40,17 +41,24 @@ func main() {
 				Name:  fmt.Sprintf("Metric collection: %s", module.Name),
 				Image: imageName,
 				Spec: map[string]string{
-					"connection":          "${connections.gcp.'content-and-tooling-lab'}",
-					"module_owner":        moduleOwner,
-					"module_name":         module.Name,
-					"github_token":        "${secrets.GITHUB_TOKEN}",
-					"bigquery_project_id": "${secrets.BIGQUERY_PROJECT}",
+					"connection":           "${connections.gcp.'content-and-tooling-lab'}",
+					"repo_owner":           moduleOwner,
+					"repo_name":            module.Name,
+					"github_token":         "${secrets.GITHUB_TOKEN}",
+					"big_query_project_id": "${secrets.BIG_QUERY_PROJECT_ID}",
 				},
 			},
 		)
 	}
 
-	w.Print(nil)
+	err = w.Write(nil)
+	if err != nil {
+		if err != workflow.ErrValidation {
+			fmt.Println(err)
+		}
+
+		os.Exit(1)
+	}
 }
 
 func getSupportedModules() (*[]collar.Module, error) {

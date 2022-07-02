@@ -10,7 +10,7 @@ The package exports a Workflow interface that provides methods for adding Trigge
 
 `main.go` serves as a good example of using this package.
 
-The `Print` method writes directly to `stdout`, therefore output from the tool can be piped in to a new file:
+The `Write` method writes directly to `stdout`, therefore output from the tool can be piped in to a new file:
 
 ```bash
 go run . > my_workflow.yaml
