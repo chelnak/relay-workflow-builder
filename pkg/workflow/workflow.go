@@ -17,6 +17,7 @@ type Workflow interface {
 	AddParameter(key string, defaultValue string, description string)
 	AddTrigger(trigger Trigger)
 	AddStep(step Step)
+	GetSteps() []Step
 	Write(writer io.Writer) error
 }
 
@@ -87,6 +88,11 @@ func (w *workflow) AddTrigger(trigger Trigger) {
 // AddStep adds a step to the Workflow.
 func (w *workflow) AddStep(step Step) {
 	w.Steps = append(w.Steps, step)
+}
+
+// GetSteps returns a slice of Step.
+func (w *workflow) GetSteps() []Step {
+	return w.Steps
 }
 
 // Validate validates that certain properties are available in the struct that
